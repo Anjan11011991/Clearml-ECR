@@ -1,6 +1,5 @@
 import subprocess
 import logging
-from clearml import Task
 import boto3
 import os
 import base64
@@ -9,27 +8,22 @@ def run_docker(command):
     try:
         # Log the command being run
         logging.info(f'Running command: {" ".join(command)}')
-        task.get_logger().report_text(f'Running command: {" ".join(command)}')
 
         # Run the Docker command
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
         # Log the output and errors
         logging.info(f'Output: {result.stdout}')
-        task.get_logger().report_text(f'Output: {result.stdout}')
         
         if result.stderr:
             logging.error(f'Error: {result.stderr}')
-            task.get_logger().report_text(f'Error: {result.stderr}')
 
         # Check if the command was successful
         if result.returncode != 0:
             logging.error(f'Command failed with return code: {result.returncode}')
-            task.get_logger().report_text(f'Command failed with return code: {result.returncode}')
 
     except Exception as e:
         logging.error(f'An error occurred: {str(e)}')
-        task.get_logger().report_text(f'An error occurred: {str(e)}')
 
 def get_ecr_login_info(region):
     # Create a boto3 client for ECR
@@ -92,7 +86,3 @@ if __name__ == "__main__":
 
     except Exception as e:
         print(f"An error occurred: {e}")
-
-    finally:
-        # Close the ClearML task
-        task.close()
